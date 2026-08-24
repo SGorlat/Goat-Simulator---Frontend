@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { createCareer } from "../services/api";
 import { useNavigate } from "react-router-dom";
+import "../style/createCareer.css";
 
 function CreateCareer() {
   const [playerName, setPlayerName] = useState("");
@@ -15,8 +16,8 @@ function CreateCareer() {
   };
 
   return (
-    <div>
-      <div>
+    <div className="form-container">
+      <div className="form-group">
         <label htmlFor="name">Nombre:</label>
         <input
           type="text"
@@ -27,7 +28,7 @@ function CreateCareer() {
         />
         <label htmlFor="postion">Posición:</label>
       </div>
-      <div>
+      <div className="form-group">
         <select
           name="position"
           id="position"
@@ -39,7 +40,7 @@ function CreateCareer() {
           <option value="9">Mediapunta</option>
         </select>
       </div>
-      <div>
+      <div className="form-group">
         <select
           name="nationality"
           id="nationality"

@@ -8,6 +8,7 @@ import {
   nextTurn,
   simulateSeason,
 } from "../services/api";
+import "../style/GameScreen.css";
 
 function GameScreen() {
   const { id } = useParams(); // Si la URL es /game/5, entonces id = "5", recoge parama de la URL
@@ -112,95 +113,179 @@ function GameScreen() {
 
   return (
     <div>
-      <h1>Pantalla de juego - Carrera de {career.playerName}</h1>
-      <div className="player_card">
-        <div>
-          <p>{career.playerName}</p>
+      <h1>Carrera de {career.playerName}</h1>
+      <div className="player-card">
+        <div className="player-info">
+          <p className="player-name">{career.playerName}</p>
           <p>{career.position?.name}</p>
           <p>{career.nationality}</p>
           <p>{career.currentTeam?.name || "Sin equipo"}</p>
           <p>{career.currentRole || "Sin rol definido"}</p>
-          <p>{career.currentAge}</p>
+          <p>Edad: {career.currentAge}</p>
         </div>
-        <div>
-          <div>
-            <h3>Stats iniciales</h3>
+        <h3>Stats</h3>
+        <div className="stats-grid">
+          <div className="stat-item">
+            <span className="stat-label">Definición</span>
+            <span className="stat-value">{career.finishing}</span>
           </div>
-          <p>Definición: {career.finishing}</p>
-          <p>Velocidad: {career.speed}</p>
-          <p>Técnica: {career.technique}</p>
-          <p>Visión: {career.vision}</p>
-          <p>Forma física: {career.physical}</p>
-          <p>Mentalidad: {career.mental}</p>
+          <div className="stat-item">
+            <span className="stat-label">Velocidad</span>
+            <span className="stat-value">{career.speed}</span>
+          </div>
+          <div className="stat-item">
+            <span className="stat-label">Técnica</span>
+            <span className="stat-value">{career.technique}</span>
+          </div>
+          <div className="stat-item">
+            <span className="stat-label">Visión</span>
+            <span className="stat-value">{career.vision}</span>
+          </div>
+          <div className="stat-item">
+            <span className="stat-label">Física</span>
+            <span className="stat-value">{career.physical}</span>
+          </div>
+          <div className="stat-item">
+            <span className="stat-label">Mental</span>
+            <span className="stat-value">{career.mental}</span>
+          </div>
         </div>
-        <p>Reputación: {career.reputation}</p>
-        <p>Dinero: {career.savings}</p>
+        <h3>Relaciones</h3>
+        <div className="stats-grid" style={{ marginTop: "12px" }}>
+          <div className="stat-item">
+            <span className="stat-label">Afición</span>
+            <span className="stat-value">{career.fansRelation}</span>
+          </div>
+          <div className="stat-item">
+            <span className="stat-label">Directiva</span>
+            <span className="stat-value">{career.boardRelation}</span>
+          </div>
+          <div className="stat-item">
+            <span className="stat-label">Vestuario</span>
+            <span className="stat-value">{career.teamRelation}</span>
+          </div>
+        </div>
+        <h3>General</h3>
+        <div className="stats-grid" style={{ marginTop: "12px" }}>
+          <div className="stat-item">
+            <span className="stat-label">Reputación</span>
+            <span className="stat-value">{career.reputation}</span>
+          </div>
+          <div className="stat-item">
+            <span className="stat-label">Dinero</span>
+            <span className="stat-value">{career.savings}</span>
+          </div>
+        </div>
       </div>
-      <div>
-        {currentEvent && !outcomeText && (
-          <div>
-            <p>{currentEvent.title}</p>
-            <p>{currentEvent.description}</p>
+
+      {currentEvent && !outcomeText && (
+        <div className="event-card">
+          <p className="event-title">{currentEvent.title}</p>
+          <p className="event-description">{currentEvent.description}</p>
+          <div className="event-options">
             {currentEvent.options.map((eventOpt) => (
-              <div key={eventOpt.id}>
-                <p>{eventOpt.text}</p>
-                <button
-                  onClick={() =>
-                    handleChoose(career.id, currentEvent.id, eventOpt.id)
-                  }
-                >
-                  Elegir
-                </button>
-              </div>
+              <button
+                className="option-btn"
+                key={eventOpt.id}
+                onClick={() =>
+                  handleChoose(career.id, currentEvent.id, eventOpt.id)
+                }
+              >
+                {eventOpt.text}
+              </button>
             ))}
           </div>
-        )}
-        {outcomeText && nextEvent < events.length && (
-          <div>
-            <p>{outcomeText}</p>
-            <button onClick={() => setOutcomeText(null)}>Continuar</button>
+        </div>
+      )}
+
+      {outcomeText && nextEvent < events.length && (
+        <div className="outcome-card">
+          <p className="outcome-text">{outcomeText}</p>
+          <button onClick={() => setOutcomeText(null)}>Continuar</button>
+        </div>
+      )}
+
+      {outcomeText && nextEvent >= events.length && (
+        <div className="outcome-card">
+          <p className="outcome-text">{outcomeText}</p>
+          <button onClick={handleEndSeason}>Finalizar temporada</button>
+        </div>
+      )}
+
+      {seasonResult && (
+        <div className="season-summary">
+          <h2>Resumen de Temporada {seasonResult.seasonNumber}</h2>
+          <div className="season-stats">
+            <div className="season-stat">
+              <span className="stat-label">Goles</span>
+              <span className="stat-value">{seasonResult.goals}</span>
+            </div>
+            <div className="season-stat">
+              <span className="stat-label">Asistencias</span>
+              <span className="stat-value">{seasonResult.assists}</span>
+            </div>
+            <div className="season-stat">
+              <span className="stat-label">Posición</span>
+              <span className="stat-value">{seasonResult.leaguePosition}º</span>
+            </div>
+            <div className="season-stat">
+              <span className="stat-label">Valoración</span>
+              <span className="stat-value">{seasonResult.seasonRating}</span>
+            </div>
+            <div className="season-stat">
+              <span className="stat-label">Equipo</span>
+              <span className="stat-value">{seasonResult.team?.name}</span>
+            </div>
+            <div className="season-stat">
+              <span className="stat-label">Premios</span>
+              <span className="stat-value">
+                {seasonResult.titlesWon || "Ninguno"}
+              </span>
+            </div>
           </div>
-        )}
-        {outcomeText && nextEvent >= events.length && (
-          <div>
-            <p>{outcomeText}</p>
-            <button onClick={handleEndSeason}>Finalizar temporada</button>
-          </div>
-        )}
-      </div>
-      <div>
-        {seasonResult && (
-          <div>
-            <p>Goles: {seasonResult.goals}</p>
-            <p>Asistencias: {seasonResult.assists}</p>
-            <p>Equipo actual:{seasonResult.team?.name}</p>
-            <p>Posición de equipo en Liga: {seasonResult.leaguePosition}</p>
-            <p>Titulos ganados: {seasonResult.titlesWon}</p>
-            <p>Valoración: {seasonResult.seasonRating}</p>
-            <p>Temporada nº: {seasonResult.seasonNumber}</p>
-            {career.contractYearsLeft > 1 && (
-              <button onClick={nextSeason}>
-                Seguir en el {career.currentTeam?.name}
-              </button>
-            )}
-            <button onClick={handleShowOffers}>Ver ofertas del mercado</button>
-          </div>
-        )}
-      </div>
-      {offers.length > 0 &&
-        offers.map((o, index) => (
-          <div key={o.teamId || index}>
-            <p>Equipo: {o.teamName}</p>
-            <p>Liga: {o.leagueName}</p>
-            <p>Salario: {o.offeredSalary}</p>
-            <p>Estatus: {o.role}</p>
-            <p>Años de contrato: {o.contractYears}</p>
-            <button onClick={() => handleAcceptOffer(o)}>Aceptar oferta</button>
-          </div>
-        ))}
+          {career.contractYearsLeft > 1 && (
+            <button onClick={nextSeason}>
+              Seguir en el {career.currentTeam?.name}
+            </button>
+          )}
+          <button className="btn-secondary" onClick={handleShowOffers}>
+            Ver ofertas del mercado
+          </button>
+        </div>
+      )}
+
+      {offers.length > 0 && (
+        <div>
+          {offers.map((o, index) => (
+            <div className="offer-card" key={o.teamId || index}>
+              <div className="offer-info">
+                <p className="offer-team">{o.teamName}</p>
+                <p className="offer-details">
+                  {o.leagueName} · {o.role} · {o.contractYears} años
+                </p>
+              </div>
+              <span className="offer-salary">
+                {o.offeredSalary.toLocaleString()} €
+              </span>
+              <button onClick={() => handleAcceptOffer(o)}>Fichar</button>
+            </div>
+          ))}
+          {career.contractYearsLeft > 1 && (
+            <button
+              className="btn-secondary"
+              onClick={() => {
+                setOffers([]);
+                nextSeason();
+              }}
+            >
+              Rechazar todas y seguir en el {career.currentTeam?.name}
+            </button>
+          )}
+        </div>
+      )}
 
       {justSigned && (
-        <div>
+        <div className="celebration">
           <h2>¡Has fichado por el {career.currentTeam?.name}!</h2>
           <p>Los aficionados están deseando verte jugar.</p>
           <button

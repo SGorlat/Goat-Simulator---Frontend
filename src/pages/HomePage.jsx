@@ -1,16 +1,19 @@
 import { useNavigate } from "react-router-dom";
+import "../style/HomePage.css";
 
 function HomePage() {
   const navigate = useNavigate();
 
   return (
-    <div>
-      <div>
-        <h1>THE GOAT</h1>
-        <h2>Football Career Simulator</h2>
-        <button onClick={() => navigate("/create")}>Nueva Carrera</button>
-        <button onClick={() => navigate("/rankings")}>Hall of Fame</button>
-      </div>
+    <div className="home-container">
+      <h1 className="home-title">THE GOAT</h1>
+      <p className="home-subtitle">Football Career Simulator</p>
+      <button className="btn-primary" onClick={() => navigate("/create")}>
+        Nueva Carrera
+      </button>
+      <button className="btn-secondary" onClick={() => navigate("/rankings")}>
+        Hall of Fame
+      </button>
     </div>
   );
 }
