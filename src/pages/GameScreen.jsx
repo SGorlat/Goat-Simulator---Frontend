@@ -7,7 +7,10 @@ import {
   getOffers,
   nextTurn,
   simulateSeason,
+  saveRankings,
 } from "../services/api";
+import { formatMoney } from "../services/utils";
+import { useNavigate } from "react-router-dom";
 import "../style/GameScreen.css";
 
 function GameScreen() {
@@ -20,6 +23,8 @@ function GameScreen() {
   const [seasonResult, setSeasonResult] = useState(null); // Resultados temporada
   const [offers, setOffers] = useState([]);
   const [justSigned, setJustSigned] = useState(false);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     // fetch de los datos de la career
@@ -111,8 +116,17 @@ function GameScreen() {
     setOffers(myOffers);
   };
 
+  // OPCIÓN DE RETIRADA
+  const handleRetire = async () => {
+    await saveRankings(id);
+    navigate("/");
+  };
+
   return (
     <div>
+      <button className="btn-secondary" onClick={() => navigate("/")}>
+        Volver a inicio
+      </button>
       <h1>Carrera de {career.playerName}</h1>
       <div className="player-card">
         <div className="player-info">
@@ -173,7 +187,7 @@ function GameScreen() {
           </div>
           <div className="stat-item">
             <span className="stat-label">Dinero</span>
-            <span className="stat-value">{career.savings}</span>
+            <span className="stat-value">{formatMoney(career.savings)}</span>
           </div>
         </div>
       </div>
@@ -251,6 +265,11 @@ function GameScreen() {
           <button className="btn-secondary" onClick={handleShowOffers}>
             Ver ofertas del mercado
           </button>
+          {career.currentAge >= 32 && (
+            <button className="btn-danger" onClick={handleRetire}>
+              Retirarse
+            </button>
+          )}
         </div>
       )}
 
@@ -265,7 +284,7 @@ function GameScreen() {
                 </p>
               </div>
               <span className="offer-salary">
-                {o.offeredSalary.toLocaleString()} €
+                {formatMoney(o.offeredSalary)} €
               </span>
               <button onClick={() => handleAcceptOffer(o)}>Fichar</button>
             </div>
