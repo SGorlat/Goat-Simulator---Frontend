@@ -8,6 +8,8 @@ import {
   nextTurn,
   simulateSeason,
   saveRankings,
+  getItems,
+  buyItem,
 } from "../services/api";
 import { formatMoney } from "../services/utils";
 import { useNavigate } from "react-router-dom";
@@ -23,6 +25,8 @@ function GameScreen() {
   const [seasonResult, setSeasonResult] = useState(null); // Resultados temporada
   const [offers, setOffers] = useState([]);
   const [justSigned, setJustSigned] = useState(false);
+  const [showShop, setShowShop] = useState(false); // Mostrar tienda
+  const [shopItems, setShopItems] = useState([]); // Item que compramos
 
   const navigate = useNavigate();
 
@@ -104,6 +108,38 @@ function GameScreen() {
     setCareer(updateCareer);
 
     setJustSigned(true); // recien fichado accede a pantalla de celebracion
+  };
+
+  // Mostrar tienda
+  const handleOpenShop = async () => {
+    setOutcomeText(null);
+    setEvents([]);
+    setSeasonResult(null);
+    setOffers([]);
+    setJustSigned(false);
+
+    const items = await getItems(id);
+    setShowShop(true);
+    setShopItems(items);
+  };
+
+  // Ocultar tienda
+  const handleCloseShop = async () => {
+    setShowShop(false);
+    nextSeason();
+  };
+
+  // Item comprados
+  const handleBuyItem = async (itemId) => {
+    await buyItem(id, itemId); // no necesito asignarle const porque no se va a usar
+
+    // ACTRUALIZAMOS CAREER
+    const myCareer = await getCareer(id);
+    setCareer(myCareer);
+
+    // Actualizamos items
+    const updatedItems = await getItems(id);
+    setShopItems(updatedItems);
   };
 
   // VER OFERTAS
@@ -258,7 +294,7 @@ function GameScreen() {
             </div>
           </div>
           {career.contractYearsLeft > 1 && (
-            <button onClick={nextSeason}>
+            <button onClick={handleOpenShop}>
               Seguir en el {career.currentTeam?.name}
             </button>
           )}
@@ -284,7 +320,7 @@ function GameScreen() {
                 </p>
               </div>
               <span className="offer-salary">
-                {formatMoney(o.offeredSalary)} €
+                {formatMoney(o.offeredSalary)}
               </span>
               <button onClick={() => handleAcceptOffer(o)}>Fichar</button>
             </div>
@@ -293,8 +329,8 @@ function GameScreen() {
             <button
               className="btn-secondary"
               onClick={() => {
-                setOffers([]);
-                nextSeason();
+                // nextSeason();
+                handleOpenShop();
               }}
             >
               Rechazar todas y seguir en el {career.currentTeam?.name}
@@ -310,11 +346,32 @@ function GameScreen() {
           <button
             onClick={() => {
               setJustSigned(false);
-              nextSeason();
+              // nextSeason();
+              handleOpenShop();
             }}
           >
             Iniciar temporada
           </button>
+        </div>
+      )}
+      {showShop && (
+        <div>
+          <h2>Equipo Personal</h2>
+          {shopItems.map((item) => (
+            <div key={item.id}>
+              <p>{item.name}</p>
+              <p>{item.description}</p>
+              <p>{formatMoney(item.price)}</p>
+              {item.active ? (
+                <p>Ya lo tienes</p>
+              ) : career.savings < item.price ? (
+                <button disabled>No tienes suficiente dinero</button>
+              ) : (
+                <button onClick={() => handleBuyItem(item.id)}>Adquirir</button>
+              )}
+            </div>
+          ))}
+          <button onClick={handleCloseShop}>Iniciar temporada</button>
         </div>
       )}
     </div>
