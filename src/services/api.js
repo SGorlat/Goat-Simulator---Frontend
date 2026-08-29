@@ -80,7 +80,7 @@ export const getItems = async (careerId) => {
 // POST /api/game/shop/careerId/buy/itemid
 export const buyItem = async (careerId, itemid) => {
   const response = await fetch(
-    `${API_URL}/game/shop/${careerId}/shop/${itemid}`,
+    `${API_URL}/game/shop/${careerId}/buy/${itemid}`,
     {
       method: "POST",
     },

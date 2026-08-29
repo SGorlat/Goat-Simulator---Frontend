@@ -195,3 +195,99 @@
   flex-direction: column;
   gap: 4px;
 }
+
+/* TIENDA */
+
+/* ===== TIENDA / EQUIPO PERSONAL ===== */
+
+.shop-container {
+  background: linear-gradient(145deg, #141925, #1e2a3a);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 28px;
+  margin-bottom: 20px;
+}
+
+.shop-container h2 {
+  font-family: "Orbitron", sans-serif;
+  color: var(--accent);
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.shop-budget {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin-bottom: 20px;
+}
+
+.shop-budget span {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.shop-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.shop-item {
+  background: rgba(0, 230, 118, 0.05);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: border-color 0.2s;
+}
+
+.shop-item:hover {
+  border-color: var(--accent);
+}
+
+.shop-item.owned {
+  opacity: 0.5;
+  border-color: var(--text-secondary);
+}
+
+.shop-item-name {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text-highlight);
+}
+
+.shop-item-desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.shop-item-price {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+.shop-item .btn-owned {
+  background: transparent;
+  border: 1px solid var(--text-secondary);
+  color: var(--text-secondary);
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  cursor: default;
+}
+
+.shop-item button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-start-season {
+  display: block;
+  margin: 0 auto;
+}

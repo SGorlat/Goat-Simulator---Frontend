@@ -355,23 +355,37 @@ function GameScreen() {
         </div>
       )}
       {showShop && (
-        <div>
+        <div className="shop-container">
           <h2>Equipo Personal</h2>
-          {shopItems.map((item) => (
-            <div key={item.id}>
-              <p>{item.name}</p>
-              <p>{item.description}</p>
-              <p>{formatMoney(item.price)}</p>
-              {item.active ? (
-                <p>Ya lo tienes</p>
-              ) : career.savings < item.price ? (
-                <button disabled>No tienes suficiente dinero</button>
-              ) : (
-                <button onClick={() => handleBuyItem(item.id)}>Adquirir</button>
-              )}
-            </div>
-          ))}
-          <button onClick={handleCloseShop}>Iniciar temporada</button>
+          <p className="shop-budget">
+            Presupuesto disponible: <span>{formatMoney(career.savings)}</span>
+          </p>
+          <div className="shop-grid">
+            {shopItems.map((item) => (
+              <div
+                key={item.id}
+                className={`shop-item ${item.active ? "owned" : ""}`}
+              >
+                <span className="shop-item-name">{item.name}</span>
+                <span className="shop-item-desc">{item.description}</span>
+                <span className="shop-item-price">
+                  {formatMoney(item.price)}
+                </span>
+                {item.active ? (
+                  <button className="btn-owned">Contratado</button>
+                ) : career.savings < item.price ? (
+                  <button disabled>No tienes suficiente dinero</button>
+                ) : (
+                  <button onClick={() => handleBuyItem(item.id)}>
+                    Adquirir
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+          <button onClick={handleCloseShop} className="btn-start-season">
+            Iniciar temporada
+          </button>
         </div>
       )}
     </div>
