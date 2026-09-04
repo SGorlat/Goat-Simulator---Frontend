@@ -130,10 +130,10 @@
 }
 
 .season-stat {
-  background: rgba(255, 215, 0, 0.05);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
 }
 
 .season-stat .stat-label {

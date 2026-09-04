@@ -10,6 +10,8 @@ import {
   saveRankings,
   getItems,
   buyItem,
+  getPhase,
+  sendOption,
 } from "../services/api";
 import { formatMoney } from "../services/utils";
 import { useNavigate } from "react-router-dom";
@@ -27,6 +29,10 @@ function GameScreen() {
   const [justSigned, setJustSigned] = useState(false);
   const [showShop, setShowShop] = useState(false); // Mostrar tienda
   const [shopItems, setShopItems] = useState([]); // Item que compramos
+  const [showPreseason, setShowPreseason] = useState(false);
+  const [preseasonPhases, setPreseasonPhases] = useState([]);
+  const [currentPhase, setCurrentPhase] = useState(0);
+  const [error, setError] = useState(null);
 
   const navigate = useNavigate();
 
@@ -54,108 +60,204 @@ function GameScreen() {
   const currentEvent = events[nextEvent];
 
   const handleChoose = async (id, eventId, optionId) => {
-    const result = await choose(id, eventId, optionId); // id del useParams corresp a careerId
-    setOutcomeText(result); // guarda el texto resultado
-    setNextEvent(() => nextEvent + 1); // mostramos sigueinte evento de la lista
+    try {
+      setError(null);
+      const result = await choose(id, eventId, optionId); // id del useParams corresp a careerId
+      setOutcomeText(result); // guarda el texto resultado
+      setNextEvent(() => nextEvent + 1); // mostramos sigueinte evento de la lista
 
-    // Como recibimos nuevos stats segun la decision tomada..actualizamos
-    const updateStats = await getCareer(id);
-    setCareer(updateStats);
+      // Como recibimos nuevos stats segun la decision tomada..actualizamos
+      const updateStats = await getCareer(id);
+      setCareer(updateStats);
+    } catch (err) {
+      console.error(err);
+      setError("Error al procesar la elección");
+    }
   };
 
   const handleEndSeason = async () => {
-    setOutcomeText(null);
-    setNextEvent(0);
-    setEvents([]); // ← AÑADIR — limpia los eventos
+    try {
+      setError(null);
 
-    if (career.currentTeam === null) {
-      const offers = await getOffers(id);
-      setOffers(offers);
+      setOutcomeText(null);
+      setNextEvent(0);
+      setEvents([]); // ← AÑADIR — limpia los eventos
 
-      // recargar career con los datos actualizados (edad, stats, etc.)
-      const updateCareer = await getCareer(id);
-      setCareer(updateCareer);
-    } else {
-      const simulateResult = await simulateSeason(id); // es el careerId que viene de use param(por URL)
-      setSeasonResult(simulateResult);
+      if (career.currentTeam === null) {
+        const offers = await getOffers(id);
+        setOffers(offers);
 
-      // recargar career con los datos actualizados (edad, stats, etc.)
-      const updateCareer = await getCareer(id);
-      setCareer(updateCareer);
+        // recargar career con los datos actualizados (edad, stats, etc.)
+        const updateCareer = await getCareer(id);
+        setCareer(updateCareer);
+      } else {
+        const simulateResult = await simulateSeason(id); // es el careerId que viene de use param(por URL)
+        setSeasonResult(simulateResult);
+
+        // recargar career con los datos actualizados (edad, stats, etc.)
+        const updateCareer = await getCareer(id);
+        setCareer(updateCareer);
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Error al cargar final de temporada");
     }
   };
 
   const nextSeason = async () => {
-    setSeasonResult(null);
-    setOutcomeText(null);
-    setNextEvent(0);
-    const newEvents = await nextTurn(id);
-    setEvents(newEvents);
+    try {
+      setError(null);
 
-    const updateCareer = await getCareer(id);
-    setCareer(updateCareer);
+      setSeasonResult(null);
+      setOutcomeText(null);
+      setNextEvent(0);
+      const newEvents = await nextTurn(id);
+      setEvents(newEvents);
+
+      const updateCareer = await getCareer(id);
+      setCareer(updateCareer);
+    } catch (err) {
+      console.error(err);
+      setError("Error al iniciar temporada");
+    }
   };
 
   const handleAcceptOffer = async (offer) => {
-    setOutcomeText(null);
-    setEvents([]);
+    try {
+      setError(null);
 
-    await acceptOffer(id, offer); // no necesitamos guardar lo que vuelve porque se actualiza solo en career
-    setOffers([]);
+      setOutcomeText(null);
+      setEvents([]);
 
-    // Actualizamos career
-    const updateCareer = await getCareer(id);
-    setCareer(updateCareer);
+      await acceptOffer(id, offer); // no necesitamos guardar lo que vuelve porque se actualiza solo en career
+      setOffers([]);
 
-    setJustSigned(true); // recien fichado accede a pantalla de celebracion
+      // Actualizamos career
+      const updateCareer = await getCareer(id);
+      setCareer(updateCareer);
+
+      setJustSigned(true); // recien fichado accede a pantalla de celebracion
+    } catch (err) {
+      console.error(err);
+      setError("Error al aceptar la oferta");
+    }
   };
 
   // Mostrar tienda
-  const handleOpenShop = async () => {
-    setOutcomeText(null);
-    setEvents([]);
-    setSeasonResult(null);
-    setOffers([]);
-    setJustSigned(false);
+  const handleOpenPreseason = async () => {
+    try {
+      setError(null);
 
-    const items = await getItems(id);
-    setShowShop(true);
-    setShopItems(items);
+      setOutcomeText(null);
+      setEvents([]);
+      setSeasonResult(null);
+      setOffers([]);
+      setJustSigned(false);
+      setShowShop(false);
+
+      const phases = await getPhase(id);
+      setShowPreseason(true);
+      setPreseasonPhases(phases);
+      setCurrentPhase(0);
+    } catch (err) {
+      console.error(err);
+      setError("Error al cargar fases de pretemporada");
+    }
+  };
+
+  // Elegir opcion
+
+  const handlePreseasonChoice = async (phaseId, optionId) => {
+    try {
+      setError(null);
+
+      await sendOption(id, phaseId, optionId);
+
+      const updateCareer = await getCareer(id);
+      setCareer(updateCareer);
+
+      if (currentPhase < 2) {
+        setCurrentPhase(currentPhase + 1);
+      } else {
+        handleOpenShop();
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Error al enviar la opcion elegida");
+    }
+  };
+
+  const handleOpenShop = async () => {
+    try {
+      setError(null);
+
+      setShowPreseason(false);
+      const items = await getItems(id);
+      setShopItems(items);
+      setShowShop(true);
+    } catch (err) {
+      console.error(err);
+      setError("Error al mostrar tienda");
+    }
   };
 
   // Ocultar tienda
   const handleCloseShop = async () => {
-    setShowShop(false);
-    nextSeason();
+    try {
+      setError(null);
+      setShowShop(false);
+      nextSeason();
+    } catch (err) {
+      console.error(err);
+      setError("Error al cerrar tienda");
+    }
   };
 
   // Item comprados
   const handleBuyItem = async (itemId) => {
-    await buyItem(id, itemId); // no necesito asignarle const porque no se va a usar
+    try {
+      setError(null);
+      await buyItem(id, itemId); // no necesito asignarle const porque no se va a usar
 
-    // ACTRUALIZAMOS CAREER
-    const myCareer = await getCareer(id);
-    setCareer(myCareer);
+      // ACTRUALIZAMOS CAREER
+      const myCareer = await getCareer(id);
+      setCareer(myCareer);
 
-    // Actualizamos items
-    const updatedItems = await getItems(id);
-    setShopItems(updatedItems);
+      // Actualizamos items
+      const updatedItems = await getItems(id);
+      setShopItems(updatedItems);
+    } catch (err) {
+      console.error(err);
+      setError("Error comnprar item");
+    }
   };
 
   // VER OFERTAS
   const handleShowOffers = async () => {
-    setOutcomeText(null);
-    setEvents([]);
-    setSeasonResult(null);
+    try {
+      setError(null);
+      setOutcomeText(null);
+      setEvents([]);
+      setSeasonResult(null);
 
-    const myOffers = await getOffers(id);
-    setOffers(myOffers);
+      const myOffers = await getOffers(id);
+      setOffers(myOffers);
+    } catch (err) {
+      console.error(err);
+      setError("Error mostrar ofertas disponibles");
+    }
   };
 
   // OPCIÓN DE RETIRADA
   const handleRetire = async () => {
-    await saveRankings(id);
-    navigate("/");
+    try {
+      setError(null);
+      await saveRankings(id);
+      navigate("/");
+    } catch (err) {
+      console.error(err);
+      setError("Error al intentar retirar al jugador");
+    }
   };
 
   return (
@@ -165,6 +267,12 @@ function GameScreen() {
       </button>
       <h1>Carrera de {career.playerName}</h1>
       <div className="player-card">
+        {error && (
+          <div className="outcome-card">
+            <p style={{ color: "red" }}>{error}</p>
+            <button onClick={() => setError(null)}>Cerrar</button>
+          </div>
+        )}
         <div className="player-info">
           <p className="player-name">{career.playerName}</p>
           <p>{career.position?.name}</p>
@@ -293,8 +401,47 @@ function GameScreen() {
               </span>
             </div>
           </div>
+          <h3 style={{ color: "var(--gold)", marginTop: "16px" }}>Economía</h3>
+          <div className="season-stats">
+            <div className="season-stat">
+              <span className="stat-label">Salario bruto</span>
+              <span className="stat-value">
+                {formatMoney(seasonResult.salaryGross)}
+              </span>
+            </div>
+            <div className="season-stat">
+              <span className="stat-label">Impuestos</span>
+              <span className="stat-value">
+                -{formatMoney(seasonResult.taxesPaid)}
+              </span>
+            </div>
+            <div className="season-stat">
+              <span className="stat-label">Alquiler</span>
+              <span className="stat-value">
+                -{formatMoney(seasonResult.rentPaid)}
+              </span>
+            </div>
+            <div className="season-stat">
+              <span className="stat-label">Estilo de vida</span>
+              <span className="stat-value">
+                -{formatMoney(seasonResult.lifestylePaid)}
+              </span>
+            </div>
+            <div className="season-stat">
+              <span className="stat-label">Agente</span>
+              <span className="stat-value">
+                -{formatMoney(seasonResult.agentPaid)}
+              </span>
+            </div>
+            <div className="season-stat">
+              <span className="stat-label">Salario neto</span>
+              <span className="stat-value">
+                {formatMoney(seasonResult.salaryNet)}
+              </span>
+            </div>
+          </div>
           {career.contractYearsLeft > 1 && (
-            <button onClick={handleOpenShop}>
+            <button onClick={handleOpenPreseason}>
               Seguir en el {career.currentTeam?.name}
             </button>
           )}
@@ -330,7 +477,7 @@ function GameScreen() {
               className="btn-secondary"
               onClick={() => {
                 // nextSeason();
-                handleOpenShop();
+                handleOpenPreseason();
               }}
             >
               Rechazar todas y seguir en el {career.currentTeam?.name}
@@ -347,11 +494,42 @@ function GameScreen() {
             onClick={() => {
               setJustSigned(false);
               // nextSeason();
-              handleOpenShop();
+              handleOpenPreseason();
             }}
           >
             Iniciar temporada
           </button>
+        </div>
+      )}
+      {showPreseason && preseasonPhases[currentPhase] && (
+        <div className="event-card">
+          <p className="event-title">{preseasonPhases[currentPhase].title}</p>
+          <p className="event-description">
+            {preseasonPhases[currentPhase].description}
+          </p>
+          <div className="event-options">
+            {preseasonPhases[currentPhase].options.map((op) => (
+              <button
+                key={op.id}
+                className="option-btn"
+                onClick={() =>
+                  handlePreseasonChoice(preseasonPhases[currentPhase].id, op.id)
+                }
+              >
+                {op.text}
+                <span
+                  style={{
+                    color: "var(--accent)",
+                    fontSize: "0.85rem",
+                    display: "block",
+                    marginTop: "4px",
+                  }}
+                >
+                  {op.effect}
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
       )}
       {showShop && (

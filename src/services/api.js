@@ -87,3 +87,20 @@ export const buyItem = async (careerId, itemid) => {
   );
   return response.json();
 };
+
+// GET - FASE PRESEASON
+export const getPhase = async (careerId) => {
+  const response = await fetch(`${API_URL}/game/preseason/${careerId}`);
+  return response.json();
+};
+
+// POST - ENVIAR OPCION ELEGIDA
+export const sendOption = async (careerId, phaseId, optionId) => {
+  const response = await fetch(
+    `${API_URL}/game/preseason/${careerId}/${phaseId}/${optionId}`,
+    {
+      method: "POST",
+    },
+  );
+  return response.json();
+};
