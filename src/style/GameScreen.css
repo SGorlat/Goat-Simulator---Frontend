@@ -5,6 +5,16 @@
   padding: 24px;
   margin-bottom: 20px;
   box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.info-card {
+  color: #8892a4;
+  font-size: 1rem;
+}
+
+.career-title {
+  text-align: center;
 }
 
 .player-info {
@@ -129,6 +139,16 @@
   margin: 16px 0;
 }
 
+.stats-grid-two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 12px;
+  max-width: 66%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .season-stat {
   display: flex;
   flex-direction: column;
@@ -136,14 +156,24 @@
   gap: 4px;
 }
 
-.season-stat .stat-label {
-  color: var(--text-secondary);
-}
-
 .season-stat .stat-value {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--gold);
+  color: #ffd700;
+}
+
+.season-stat .stat-value-text {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #ffd700;
+}
+
+.economy-expense .stat-value {
+  color: var(--danger);
+}
+
+.economy-income .stat-value {
+  color: var(--accent);
 }
 
 .offer-card {
@@ -290,4 +320,11 @@
 .btn-start-season {
   display: block;
   margin: 0 auto;
+}
+
+.back-button {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 100;
 }

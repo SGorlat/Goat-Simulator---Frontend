@@ -262,10 +262,13 @@ function GameScreen() {
 
   return (
     <div>
-      <button className="btn-secondary" onClick={() => navigate("/")}>
+      <button
+        className="btn-secondary back-button"
+        onClick={() => navigate("/")}
+      >
         Volver a inicio
       </button>
-      <h1>Carrera de {career.playerName}</h1>
+      <h1 className="career-title">Carrera de {career.playerName}</h1>
       <div className="player-card">
         {error && (
           <div className="outcome-card">
@@ -275,11 +278,33 @@ function GameScreen() {
         )}
         <div className="player-info">
           <p className="player-name">{career.playerName}</p>
-          <p>{career.position?.name}</p>
-          <p>{career.nationality}</p>
-          <p>{career.currentTeam?.name || "Sin equipo"}</p>
-          <p>{career.currentRole || "Sin rol definido"}</p>
-          <p>Edad: {career.currentAge}</p>
+          <p>
+            <span className="info-card">Posición: </span>
+            {career.position?.name}
+          </p>
+          <p>
+            <span className="info-card">Edad: </span>
+            {career.currentAge}
+          </p>
+          <p>
+            <span className="info-card">Nacionalidad: </span>
+            {career.nationality}
+          </p>
+          <p>
+            <span className="info-card">Equipo actual: </span>
+            {career.currentTeam?.name || "Sin equipo"}
+          </p>
+          <p>
+            <span className="info-card">Rol actual: </span>
+            {career.currentRole || "Sin rol definido"}
+          </p>
+          <p>
+            <span className="info-card">Contrato: </span>
+            {career.contractYearsLeft < 1
+              ? "Sin equipo"
+              : `${career.contractYearsLeft}
+            ${career.contractYearsLeft === 1 ? "año" : "años"}`}
+          </p>
         </div>
         <h3>Stats</h3>
         <div className="stats-grid">
@@ -324,7 +349,7 @@ function GameScreen() {
           </div>
         </div>
         <h3>General</h3>
-        <div className="stats-grid" style={{ marginTop: "12px" }}>
+        <div className="stats-grid-two" style={{ marginTop: "12px" }}>
           <div className="stat-item">
             <span className="stat-label">Reputación</span>
             <span className="stat-value">{career.reputation}</span>
@@ -401,39 +426,47 @@ function GameScreen() {
               </span>
             </div>
           </div>
-          <h3 style={{ color: "var(--gold)", marginTop: "16px" }}>Economía</h3>
+          <h3
+            style={{
+              color: "#fffff",
+              marginTop: "16px",
+              marginBottom: "4px",
+            }}
+          >
+            💰 Economía
+          </h3>
           <div className="season-stats">
-            <div className="season-stat">
+            <div className="season-stat economy-income">
               <span className="stat-label">Salario bruto</span>
               <span className="stat-value">
                 {formatMoney(seasonResult.salaryGross)}
               </span>
             </div>
-            <div className="season-stat">
+            <div className="season-stat economy-expense">
               <span className="stat-label">Impuestos</span>
               <span className="stat-value">
                 -{formatMoney(seasonResult.taxesPaid)}
               </span>
             </div>
-            <div className="season-stat">
+            <div className="season-stat economy-expense">
               <span className="stat-label">Alquiler</span>
               <span className="stat-value">
                 -{formatMoney(seasonResult.rentPaid)}
               </span>
             </div>
-            <div className="season-stat">
+            <div className="season-stat economy-expense">
               <span className="stat-label">Estilo de vida</span>
               <span className="stat-value">
                 -{formatMoney(seasonResult.lifestylePaid)}
               </span>
             </div>
-            <div className="season-stat">
+            <div className="season-stat economy-expense">
               <span className="stat-label">Agente</span>
               <span className="stat-value">
                 -{formatMoney(seasonResult.agentPaid)}
               </span>
             </div>
-            <div className="season-stat">
+            <div className="season-stat economy-income">
               <span className="stat-label">Salario neto</span>
               <span className="stat-value">
                 {formatMoney(seasonResult.salaryNet)}
@@ -504,6 +537,15 @@ function GameScreen() {
       {showPreseason && preseasonPhases[currentPhase] && (
         <div className="event-card">
           <p className="event-title">{preseasonPhases[currentPhase].title}</p>
+          <p
+            style={{
+              color: "var(--text-secondary)",
+              textAlign: "center",
+              marginBottom: "16px",
+            }}
+          >
+            Fase {currentPhase + 1} de 3
+          </p>
           <p className="event-description">
             {preseasonPhases[currentPhase].description}
           </p>

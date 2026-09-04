@@ -5,6 +5,7 @@
   justify-content: center;
   min-height: 80vh;
   gap: 20px;
+  text-align: center;
 }
 
 .home-title {
@@ -14,6 +15,7 @@
   background: linear-gradient(135deg, var(--accent), var(--gold));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 40px rgba(0, 230, 118, 0.3);
 }
 
 .home-subtitle {
@@ -22,9 +24,16 @@
   margin-bottom: 20px;
 }
 
+.home-icon {
+  font-size: 4rem;
+  margin-bottom: -10px;
+}
+
 .home-buttons {
   display: flex;
-  gap: 16px;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 250px;
 }
 
 .btn-secondary {
