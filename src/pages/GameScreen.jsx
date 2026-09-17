@@ -12,9 +12,11 @@ import {
   buyItem,
   getPhase,
   sendOption,
+  getRenewal,
 } from "../services/api";
 import { formatMoney } from "../services/utils";
 import { useNavigate } from "react-router-dom";
+import PenaltyGame from "../components/PenaltyGame";
 import "../style/GameScreen.css";
 
 function GameScreen() {
@@ -33,6 +35,7 @@ function GameScreen() {
   const [preseasonPhases, setPreseasonPhases] = useState([]);
   const [currentPhase, setCurrentPhase] = useState(0);
   const [error, setError] = useState(null);
+  const [renewalOffer, setRenewalOffer] = useState(null);
 
   const navigate = useNavigate();
 
@@ -81,7 +84,7 @@ function GameScreen() {
 
       setOutcomeText(null);
       setNextEvent(0);
-      setEvents([]); // ← AÑADIR — limpia los eventos
+      setEvents([]); // limpia los eventos
 
       if (career.currentTeam === null) {
         const offers = await getOffers(id);
@@ -131,6 +134,7 @@ function GameScreen() {
 
       await acceptOffer(id, offer); // no necesitamos guardar lo que vuelve porque se actualiza solo en career
       setOffers([]);
+      setRenewalOffer(null);
 
       // Actualizamos career
       const updateCareer = await getCareer(id);
@@ -260,6 +264,22 @@ function GameScreen() {
     }
   };
 
+  // VER OFERTRAS RENOVACIÓN
+  const handleOnRenewal = async () => {
+    try {
+      setError(null);
+      setOutcomeText(null);
+      setEvents([]);
+      setSeasonResult(null);
+
+      const myRenewal = await getRenewal(id);
+      setRenewalOffer(myRenewal);
+    } catch (err) {
+      console.error(err);
+      setError("Error al obtener la oferta de renovación");
+    }
+  };
+
   return (
     <div>
       <button
@@ -365,19 +385,30 @@ function GameScreen() {
         <div className="event-card">
           <p className="event-title">{currentEvent.title}</p>
           <p className="event-description">{currentEvent.description}</p>
-          <div className="event-options">
-            {currentEvent.options.map((eventOpt) => (
-              <button
-                className="option-btn"
-                key={eventOpt.id}
-                onClick={() =>
-                  handleChoose(career.id, currentEvent.id, eventOpt.id)
-                }
-              >
-                {eventOpt.text}
-              </button>
-            ))}
-          </div>
+          {currentEvent.minigame ? (
+            <PenaltyGame
+              onResult={(result) => {
+                const option = currentEvent.options.find((opt) =>
+                  opt.text.toLowerCase().includes(result),
+                );
+                handleChoose(career.id, currentEvent.id, option.id);
+              }}
+            />
+          ) : (
+            <div className="event-options">
+              {currentEvent.options.map((eventOpt) => (
+                <button
+                  className="option-btn"
+                  key={eventOpt.id}
+                  onClick={() =>
+                    handleChoose(career.id, currentEvent.id, eventOpt.id)
+                  }
+                >
+                  {eventOpt.text}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -486,6 +517,39 @@ function GameScreen() {
               Retirarse
             </button>
           )}
+          {career.contractYearsLeft === 1 && (
+            <button onClick={() => handleOnRenewal()}>
+              Ver oferta de renovación
+            </button>
+          )}
+        </div>
+      )}
+      {renewalOffer && (
+        <div>
+          <div className="offer-card" key={renewalOffer.teamId}>
+            <div className="offer-info">
+              <p className="offer-team">{renewalOffer.teamName}</p>
+              <p className="offer-details">
+                {renewalOffer.leagueName} · {renewalOffer.role} ·{" "}
+                {renewalOffer.contractYears}{" "}
+                {renewalOffer.contractYears === 1 ? "año" : "años"}
+              </p>
+            </div>
+            <span className="offer-salary">
+              {formatMoney(renewalOffer.offeredSalary)}
+            </span>
+            <button onClick={() => handleAcceptOffer(renewalOffer)}>
+              Renovar
+            </button>
+            <button
+              onClick={() => {
+                setRenewalOffer(null);
+                handleShowOffers();
+              }}
+            >
+              Rechazar y ver ofertas
+            </button>
+          </div>
         </div>
       )}
 
@@ -496,7 +560,8 @@ function GameScreen() {
               <div className="offer-info">
                 <p className="offer-team">{o.teamName}</p>
                 <p className="offer-details">
-                  {o.leagueName} · {o.role} · {o.contractYears} años
+                  {o.leagueName} · {o.role} · {o.contractYears}{" "}
+                  {o.contractYears === 1 ? "año" : "años"}
                 </p>
               </div>
               <span className="offer-salary">

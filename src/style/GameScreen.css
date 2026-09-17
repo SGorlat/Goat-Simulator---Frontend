@@ -312,9 +312,16 @@
   cursor: default;
 }
 
-.shop-item button:disabled {
+/* .shop-item button:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+} */
+
+.shop-item button:disabled {
+  background: #2a2a2a;
+  color: #666;
+  cursor: not-allowed;
+  opacity: 1;
 }
 
 .btn-start-season {

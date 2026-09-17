@@ -57,6 +57,12 @@ export const acceptOffer = async (careerId, offer) => {
   return response.json();
 };
 
+// GET /api/game/renewal/{careerId} ->/Oferta de renovacion
+export const getRenewal = async (careerId) => {
+  const response = await fetch(`${API_URL}/game/renewal/${careerId}`);
+  return response.json();
+};
+
 // GET /api/rankings -> ver rankings
 export const topRankings = async () => {
   const response = await fetch(`${API_URL}/rankings`);
