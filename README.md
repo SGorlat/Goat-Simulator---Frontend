@@ -1,16 +1,28 @@
-# React + Vite
+# GOAT Simulator — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Football career simulator where you create a player and guide them through seasons of events, transfers, cup tournaments, and rankings.
 
-Currently, two official plugins are available:
+Built as the frontend for a full-stack project with a [Spring Boot + PostgreSQL backend](https://github.com/SGorlat/Goat-Simulator---Backend).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Features
 
-## React Compiler
+- Create a player (name, position, nationality) and start a career
+- Season events with branching choices that affect your stats
+- Cup tournament with penalty shootouts
+- Transfer market with offers and contract renewals
+- Item shop to boost your player
+- Preseason training phases
+- Season simulation with results and prizes
+- Global rankings leaderboard
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Tech Stack
 
-## Expanding the ESLint configuration
+- React (Vite)
+- JavaScript
+- REST API consumption (Fetch)
+- JWT authentication
+- Socket.io (real-time features)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Related
+
+- [Backend repository](https://github.com/SGorlat/Goat-Simulator---Backend) — Spring Boot + PostgreSQL
