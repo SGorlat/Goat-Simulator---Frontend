@@ -13,6 +13,8 @@ import {
   getPhase,
   sendOption,
   getRenewal,
+  getRoundCup,
+  sendCupResult,
 } from "../services/api";
 import { formatMoney } from "../services/utils";
 import { useNavigate } from "react-router-dom";
@@ -36,6 +38,8 @@ function GameScreen() {
   const [currentPhase, setCurrentPhase] = useState(0);
   const [error, setError] = useState(null);
   const [renewalOffer, setRenewalOffer] = useState(null);
+  const [infoCup, setInfoCup] = useState(null);
+  const [isCup, setIsCup] = useState(false);
 
   const navigate = useNavigate();
 
@@ -280,6 +284,44 @@ function GameScreen() {
     }
   };
 
+  // INICIO COPA
+
+  const handleStartCup = async () => {
+    try {
+      setError(null);
+      setOutcomeText(null);
+
+      const dataCup = await getRoundCup(id);
+
+      if (dataCup !== null) {
+        setInfoCup(dataCup);
+        setIsCup(true);
+      }
+    } catch (err) {
+      console.error(err);
+      setError("No se ha podido cargar la Copa");
+    }
+  };
+
+  // RESULTADO COPA
+
+  const handleCupResult = async (won) => {
+    try {
+      await sendCupResult(id, won);
+      const dataCup = await getRoundCup(id);
+
+      if (dataCup !== null) {
+        setInfoCup(dataCup);
+      } else {
+        setIsCup(false);
+        setInfoCup(null);
+      }
+    } catch (err) {
+      console.error(err);
+      setError("No se ha podido cargar el resultado de ronda de Copa");
+    }
+  };
+
   return (
     <div>
       <button
@@ -381,7 +423,7 @@ function GameScreen() {
         </div>
       </div>
 
-      {currentEvent && !outcomeText && (
+      {currentEvent && !outcomeText && !isCup && (
         <div className="event-card">
           <p className="event-title">{currentEvent.title}</p>
           <p className="event-description">{currentEvent.description}</p>
@@ -415,7 +457,29 @@ function GameScreen() {
       {outcomeText && nextEvent < events.length && (
         <div className="outcome-card">
           <p className="outcome-text">{outcomeText}</p>
-          <button onClick={() => setOutcomeText(null)}>Continuar</button>
+          <button
+            onClick={() =>
+              nextEvent === 3 ? handleStartCup() : setOutcomeText(null)
+            }
+          >
+            Continuar
+          </button>
+        </div>
+      )}
+
+      {isCup && (
+        <div>
+          <p>Ronda: {infoCup.roundName}</p>
+          <p>Rival: {infoCup.rivalName}</p>
+          <PenaltyGame
+            onResult={(rdo) => {
+              if (rdo === "gol") {
+                handleCupResult(true);
+              } else {
+                handleCupResult(false);
+              }
+            }}
+          />
         </div>
       )}
 

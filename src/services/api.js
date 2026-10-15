@@ -110,3 +110,22 @@ export const sendOption = async (careerId, phaseId, optionId) => {
   );
   return response.json();
 };
+
+// RUTAS COPA
+
+// GET - Obtener ronda y rival
+export const getRoundCup = async (careerId) => {
+  const response = await fetch(`${API_URL}/game/cup/${careerId}`);
+  return response.json();
+};
+
+// POST - Enviar resultado ronda
+export const sendCupResult = async (careerId, won) => {
+  const response = await fetch(
+    `${API_URL}/game/cup/${careerId}/result?won=${won}`,
+    {
+      method: "POST",
+    },
+  );
+  return response.text(); // Devuelve texto plano con el rdo
+};
