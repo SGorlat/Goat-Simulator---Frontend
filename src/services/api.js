@@ -1,5 +1,5 @@
 // PARA LAS LLAMADAS AL BACKEND
-const API_URL = "http://localhost:8080/api";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
 
 // POST /api/careers -> crear carrera
 export const createCareer = async (playerName, positionId, nationality) => {
