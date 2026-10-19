@@ -1,18 +1,33 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createCareer } from "../services/api";
 import { useNavigate } from "react-router-dom";
 import "../style/createCareer.css";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080/api";
+
 function CreateCareer() {
   const [playerName, setPlayerName] = useState("");
-  const [position, setPosition] = useState("7"); // Delantero por defecto (7:DEL,8:EXT,9:MP)
+  const [positions, setPositions] = useState([]);
+  const [position, setPosition] = useState("");
   const [nationality, setNationality] = useState("España");
 
   const navigate = useNavigate();
 
+  // Carga las posiciones del backend al montar el componente
+  useEffect(() => {
+    fetch(`${API_URL}/positions`)
+      .then((res) => res.json())
+      .then((data) => {
+        setPositions(data);
+        if (data.length > 0) {
+          setPosition(data[0].id); // Primera posición como valor por defecto
+        }
+      });
+  }, []);
+
   const handlesubmit = async () => {
     const career = await createCareer(playerName, position, nationality);
-    navigate(`/game/${career.id}`); // createCareer devuelve el objeto career del backend (con id, stats...). Usas ese id para navegar a la pantalla de juego de ESA carrera concreta
+    navigate(`/game/${career.id}`);
   };
 
   return (
@@ -24,9 +39,9 @@ function CreateCareer() {
           name="name"
           id="name"
           value={playerName}
-          onChange={(e) => setPlayerName(e.target.value)} // onChange se dispara cuando el jugador teclea y va guardandolo en el estado
+          onChange={(e) => setPlayerName(e.target.value)}
         />
-        <label htmlFor="postion">Posición:</label>
+        <label htmlFor="position">Posición:</label>
       </div>
       <div className="form-group">
         <select
@@ -35,9 +50,11 @@ function CreateCareer() {
           value={position}
           onChange={(e) => setPosition(e.target.value)}
         >
-          <option value="7">Delantero</option>
-          <option value="8">Extremo</option>
-          <option value="9">Mediapunta</option>
+          {positions.map((pos) => (
+            <option key={pos.id} value={pos.id}>
+              {pos.name}
+            </option>
+          ))}
         </select>
       </div>
       <div className="form-group">
