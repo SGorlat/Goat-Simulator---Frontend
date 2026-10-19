@@ -291,6 +291,10 @@ function GameScreen() {
       setError(null);
       setOutcomeText(null);
 
+      if (!career.currentTeam) {
+        return;
+      }
+
       const dataCup = await getRoundCup(id);
 
       if (dataCup !== null) {
